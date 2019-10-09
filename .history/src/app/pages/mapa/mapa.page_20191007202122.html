@@ -1,0 +1,67 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Repartidores</ion-title>
+    </ion-toolbar>
+    <ion-toolbar color="primary">
+        <ion-segment (ionChange)="segmentChanged($event)" [disabled]="!repaReady">
+            <ion-segment-button value="lista" [checked]="pagina === 'lista'">
+                <ion-label>Lista</ion-label>
+            </ion-segment-button>
+            <ion-segment-button [disabled]="repartidores && repartidores.length === 0" value="mapa" [checked]="pagina === 'mapa'">
+                <ion-label>Mapa</ion-label>
+            </ion-segment-button>
+        </ion-segment>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div [ngSwitch]="pagina">
+        <div *ngSwitchCase="'lista'">
+            <ion-list>
+                <ion-item *ngFor="let item of repartidores; let i = index" lines="full" style="cursor: pointer" (click)="ubicarRepartidor(item, i)">
+                    <ion-avatar slot="start">
+                        <img [src]="item.datos.foto || '../../../assets/img/chofer.png'" />
+                    </ion-avatar>
+                    <ion-label>
+                        <h2>{{item.datos.nombre}}</h2>
+                        <p>Venta: {{item.sumario.venta | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                        <p>Gasto: {{item.sumario.gasto | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                        <p>Viajes: {{item.sumario.viajes}}</p>
+                    </ion-label>
+                </ion-item>
+            </ion-list>
+        </div>
+        <div *ngSwitchCase="'mapa'">
+            <agm-map [latitude]="ubicacion.lat" [longitude]="ubicacion.lng" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true" maxZoom="17" fitBoundsPadding="bottom: 10; left: 10; right: 10; top: 10">
+                <agm-marker *ngFor="let item of repartidores; let i = index" [agmFitBounds]="true" (markerClick)="verRepartidor(item, i)" [iconUrl]='{"url": item.icon || icon,"scaledSize": {"height": 80, "width": 60}}' [latitude]="item.ubicacion.lat" [longitude]="item.ubicacion.lng"
+                    [animation]="'DROP'"></agm-marker>
+            </agm-map>
+            <div class="cuadro" *ngIf="verChofer">
+                <div style="width: 100%; height: 100%;" *ngIf="!calPend">
+                    <div class="close">
+                        <ion-icon (click)="deSelect()" name="close"></ion-icon>
+                    </div>
+                    <ion-item lines="none" style="margin-top: 1rem" detail>
+                        <ion-avatar slot="start">
+                            <img [src]="repartidor.foto" />
+                        </ion-avatar>
+                        <ion-label>
+                            <h2>{{repartidor.nombre}}</h2>
+                        </ion-label>
+                    </ion-item>
+                    <ion-item lines="none">
+                        <ion-button fill="outline" (click)="verClientes()">
+                            <ion-icon style="margin-right: 1rem" name="car"></ion-icon> Ver ruta
+                        </ion-button>
+                        <ion-button (click)="verClientes()">
+                            <ion-icon name="contacts"></ion-icon> Ver clientes
+                        </ion-button>
+                    </ion-item>
+                </div>
+            </div>
+        </div>
+    </div>
+</ion-content>

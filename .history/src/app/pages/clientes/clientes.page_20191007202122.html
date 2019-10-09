@@ -1,0 +1,21 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Clientes</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-list>
+        <ion-item *ngFor="let cliente of clientes">
+            <ion-label>
+                <h2>{{cliente.nombre}}</h2>
+                <h4>{{cliente.direccion.direccion}}</h4>
+                <h4>Acumulado: {{cliente.acumulado | currency:'CAD':'symbol-narrow':'1.0-0'}}</h4>
+                <h4>Última compra: {{cliente.ultimaCompra | date: 'fullDate'}}</h4>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+</ion-content>

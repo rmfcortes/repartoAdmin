@@ -1,0 +1,144 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Repartidores</ion-title>
+    </ion-toolbar>
+    <ion-toolbar color="primary" class="mobile">
+        <ion-segment [disabled]="!repaReady">
+            <ion-segment-button value="lista" [checked]="pagina === 'lista'">
+                <ion-label>Lista</ion-label>
+            </ion-segment-button>
+            <ion-segment-button [disabled]="repartidores && repartidores.length === 0" value="mapa" [checked]="pagina === 'mapa'">
+                <ion-label>Mapa</ion-label>
+            </ion-segment-button>
+        </ion-segment>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-grid class="ion-no-padding escritorio">
+        <ion-row>
+            <ion-col size-md="4" size-lg="4" size-xl="4">
+                <ion-card *ngFor="let item of repartidores; let i = index">
+                    <ion-item lines="none" style="cursor: pointer" (click)="ubicarRepartidor(item, i)">
+                        <ion-avatar slot="start">
+                            <img [src]="item.datos.foto || '../../../assets/img/chofer.png'" />
+                        </ion-avatar>
+                        <ion-label>
+                            <h2>{{item.datos.nombre}}</h2>
+                            <p>Venta: {{item.sumario.venta | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                            <p>Gasto: {{item.sumario.gasto | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                            <p>Viajes: {{item.sumario.viajes}}</p>
+                        </ion-label>
+                    </ion-item>
+                    <div *ngIf="iSel === i">
+                        <div *ngIf="item.sumario.venta">
+                            <ng-container *ngIf="ventas.length > 0; else ventasTemplate">
+                                <ion-button expand="block" (click)="limpiaVentas()" color="danger">
+                                    Limpiar ventas
+                                </ion-button>
+                            </ng-container>
+                            <ng-template #ventasTemplate>
+                                <ion-button expand="block" (click)="verVentas()" [disabled]="cargando && isVentas">
+                                    <ion-icon style="margin-right: 0.75rem" name="trending-up"></ion-icon> Ventas
+                                    <ion-spinner style="margin-left: 0.75rem" name="dots" *ngIf="cargando && isVentas"></ion-spinner>
+                                </ion-button>
+                            </ng-template>
+                        </div>
+
+                        <ion-button expand="block" (click)="verRuta()">
+                            <ion-icon style="margin-right: 0.75rem" name="car"></ion-icon> Ruta
+                        </ion-button>
+                        <ion-button expand="block" (click)="verViajes()" *ngIf="item.sumario.viajes">
+                            <ion-icon style="margin-right: 0.75rem" name="filing"></ion-icon> Viajes
+                        </ion-button>
+                        <ion-button expand="block" (click)="verGastos()" *ngIf="item.sumario.gasto">
+                            <ion-icon style="margin-right: 0.75rem" name="trending-down"></ion-icon> Compras
+                        </ion-button>
+                    </div>
+                </ion-card>
+            </ion-col>
+            <ion-col size-md="8" size-lg="8" size-xl="8">
+                <div class="quieto">
+                    <div class="cuadro-detalles" *ngIf="detallesViajes.length > 0">
+                        <ion-grid class="ion-no-padding">
+                            <ion-row style="text-align: center">
+                                <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                    Viaje
+                                </ion-col>
+                                <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                    Venta
+                                </ion-col>
+                                <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                    Inicio
+                                </ion-col>
+                                <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                    Valida
+                                </ion-col>
+                                <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                    Fin
+                                </ion-col>
+                                <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                    Valida
+                                </ion-col>
+                            </ion-row>
+                            <ion-row style="text-align: center" *ngFor="let viaje of detallesViajes">
+                                <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                    {{viaje.viaje}}
+                                </ion-col>
+                                <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                    {{viaje.venta}}
+                                </ion-col>
+                                <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                    {{viaje.inicio}}
+                                </ion-col>
+                                <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                    {{viaje.validaInicio}}
+                                </ion-col>
+                                <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                    {{viaje.fin}}
+                                </ion-col>
+                                <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                    {{viaje.validaFin}}
+                                </ion-col>
+                            </ion-row>
+                        </ion-grid>
+                    </div>
+                    <agm-map style="height: 90vh;" [latitude]="ubicacion.lat" [longitude]="ubicacion.lng" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true" maxZoom="17" fitBoundsPadding="bottom: 10; left: 10; right: 10; top: 10">
+                        <agm-marker *ngFor="let item of repartidores; let i = index" [agmFitBounds]="true" (markerClick)="verRepartidor(item, i)" [iconUrl]='{"url": item.icon || icon,"scaledSize": {"height": 80, "width": 60}}' [latitude]="item.ubicacion.lat" [longitude]="item.ubicacion.lng"
+                            [animation]="'DROP'"></agm-marker>
+                        <agm-marker *ngFor="let item of ventas; let i = index" [agmFitBounds]="true" (markerClick)="verInfoCliente(item, i)" [latitude]="item.Datos.lat" [longitude]="item.Datos.lng" [animation]="'DROP'" label="{{i + 1}}"></agm-marker>
+                    </agm-map>
+                </div>
+            </ion-col>
+        </ion-row>
+    </ion-grid>
+    <div [ngSwitch]="pagina" class="mobile">
+        <div *ngSwitchCase="'lista'">
+            <ion-card *ngFor="let item of repartidores; let i = index">
+                <ion-item lines="none" style="cursor: pointer" (click)="ubicarRepartidor(item, i)" detail>
+                    <ion-avatar slot="start">
+                        <img [src]="item.datos.foto || '../../../assets/img/chofer.png'" />
+                    </ion-avatar>
+                    <ion-label>
+                        <h2>{{item.datos.nombre}}</h2>
+                        <p>Venta: {{item.sumario.venta | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                        <p>Gasto: {{item.sumario.gasto | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                        <p>Viajes: {{item.sumario.viajes}}</p>
+                    </ion-label>
+                </ion-item>
+            </ion-card>
+        </div>
+        <div *ngSwitchCase="'mapa'">
+            <agm-map style="height: 100vh;" [latitude]="ubicacion.lat" [longitude]="ubicacion.lng" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true" maxZoom="17" fitBoundsPadding="bottom: 10; left: 10; right: 10; top: 10">
+                <agm-marker *ngFor="let item of repartidores; let i = index" [agmFitBounds]="true" (markerClick)="verRepartidor(item, i)" [iconUrl]='{"url": item.icon || icon,"scaledSize": {"height": 80, "width": 60}}' [latitude]="item.ubicacion.lat" [longitude]="item.ubicacion.lng"
+                    [animation]="'DROP'"></agm-marker>
+            </agm-map>
+            <div class="cuadro" *ngIf="verChofer">
+                <app-cuadro-mapa [persona]="repartidor" (cierra)="deSelect()" (clientes)="verVentas()" (ruta)="verRuta()"></app-cuadro-mapa>
+            </div>
+        </div>
+    </div>
+</ion-content>

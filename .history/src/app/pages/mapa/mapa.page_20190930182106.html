@@ -1,0 +1,14 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Mapa</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <agm-map [latitude]="ubicacion.lat" [longitude]="ubicacion.lng" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true" fitBoundsPadding="bottom: 10; left: 10; right: 10; top: 10">
+        <agm-marker *ngFor="let item of repartidores" [agmFitBounds]="true" (markerClick)="pinSelected(item)" [iconUrl]='{"url": icon,"scaledSize": {"height": 80, "width": 60}}' [latitude]="item.ubicacion.lat" [longitude]="item.ubicacion.lng" [animation]="'DROP'"></agm-marker>
+    </agm-map>
+</ion-content>

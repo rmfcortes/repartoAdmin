@@ -1,0 +1,12 @@
+ion-menu {
+    max-width: 250px!important;
+}
+
+ion-content.background {
+    --background: url(../assets/img/fondo-menu.png) 0 0/100% 100% no-repeat;
+    --webkit-background-size: cover;
+}
+
+.activo {
+    border-left: 6px solid #045bfb;
+}

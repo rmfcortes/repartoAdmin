@@ -1,0 +1,42 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Clientes</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ng-container *ngIf="clientesReady; else elseTemplate">
+        <ion-list>
+            <ion-item *ngFor="let cliente of clientes">
+                <ion-label>
+                    <h2>{{cliente.nombre}}</h2>
+                    <h4>{{cliente.direccion.direccion}}</h4>
+                    <h4>Acumulado: {{cliente.acumulado | currency:'CAD':'symbol-narrow':'1.0-0'}}</h4>
+                    <h4>Última compra: {{cliente.ultimaCompra | date: 'fullDate'}}</h4>
+                </ion-label>
+            </ion-item>
+        </ion-list>
+    </ng-container>
+    <ng-template #elseTemplate>
+        <ion-item *ngFor="let item of [1,2,3,4,5,6,7,8,9,10]">
+            <ion-thumbnail slot="start">
+                <ion-skeleton-text></ion-skeleton-text>
+            </ion-thumbnail>
+            <ion-label>
+                <h3>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </h3>
+                <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                </p>
+                <p>
+                    <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                </p>
+            </ion-label>
+        </ion-item>
+    </ng-template>
+
+</ion-content>

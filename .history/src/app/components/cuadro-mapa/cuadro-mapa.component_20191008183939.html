@@ -1,0 +1,22 @@
+<div class="close">
+    <ion-icon (click)="deSelect()" name="close"></ion-icon>
+</div>
+<ion-item lines="none" style="margin-top: 1rem">
+    <ion-avatar slot="start">
+        <img [src]="persona.foto" />
+    </ion-avatar>
+    <ion-label>
+        <h2>{{persona.nombre}}</h2>
+    </ion-label>
+</ion-item>
+<ion-item lines="none">
+    <ion-button fill="outline" (click)="verRuta()">
+        <ion-icon style="margin-right: 1rem" name="car"></ion-icon> Ruta
+    </ion-button>
+    <ion-button (click)="verClientes()">
+        <ion-icon name="trending-up"></ion-icon>Ventas
+    </ion-button>
+    <ion-button (click)="verClientes()">
+        <ion-icon name="filing"></ion-icon>Viajes
+    </ion-button>
+</ion-item>
