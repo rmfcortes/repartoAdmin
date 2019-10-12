@@ -1,0 +1,45 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Balance</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="openCalendar()">
+                <ion-icon slot="start" name="calendar"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+    <ng-container *ngIf="balance === 0; else mainTemplate">
+        <ng-container *ngIf="cargandoCalendar; else elseTemplate">
+            <div *ngIf="!calendarioAbierto">
+                <ion-label color="medium">
+                    Cargando calendario, por favor espere
+                </ion-label>
+                <ion-progress-bar type="indeterminate"></ion-progress-bar>
+            </div>
+        </ng-container>
+        <ng-template #elseTemplate>
+            <ion-label color="medium">Elige un rango de fecha para calcular las ventas y gastos</ion-label>
+        </ng-template>
+    </ng-container>
+    <ng-template #mainTemplate>
+        <ion-grid>
+            <ion-row>
+                <ion-col size="3">
+                    <ion-card>
+                        <ion-card-title>
+                            <h1 style="color: var(--ion-color-primary); margin-left: 1rem; font-size: 30pt;">{{balance | currency:'CAD':'symbol-narrow':'1.0-0'}}</h1>
+                        </ion-card-title>
+                        <ion-card-subtitle style="text-align: center;">De: {{rango.from.string}}</ion-card-subtitle>
+                        <ion-card-subtitle style="text-align: center;">A: {{rango.to.string}}</ion-card-subtitle>
+                    </ion-card>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </ng-template>
+
+</ion-content>
