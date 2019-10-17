@@ -1,0 +1,17 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-title>Ajusta la imagen</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <image-cropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="false" [aspectRatio]="1 / 1" [resizeToWidth]="128" [resizeToHeight]="128" format="jpg" (imageCropped)="imageCropped($event)"></image-cropper>
+    <img [src]="croppedImage">
+</ion-content>
+<ion-footer>
+    <ion-toolbar>
+        <ion-button expand="block" (click)="regresar()">
+            Guardar
+        </ion-button>
+    </ion-toolbar>
+</ion-footer>

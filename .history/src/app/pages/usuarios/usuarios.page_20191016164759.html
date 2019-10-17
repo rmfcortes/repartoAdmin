@@ -1,0 +1,61 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Colaboradores</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ng-container *ngIf="colaboradores.length > 0; else elseTemplate">
+        <ion-grid fixed>
+            <ion-row>
+                <ion-col size="4" *ngFor="let item of colaboradores" style="padding-top: 1.5rem;">
+                    <div style="position: relative; width: 100%; height: 100%;">
+                        <ion-card style="padding-top: 3em;">
+                            <ion-item lines="none" style="text-align: center;">
+                                <ion-label>
+                                    <h1 style="color: var(--ion-color-primary);">{{item.nombre}}</h1>
+                                    <h2>{{item.puesto}}</h2>
+                                    <p>{{item.sueldo | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                                </ion-label>
+                            </ion-item>
+                        </ion-card>
+                        <ion-avatar style="left: 50%; top: -2.5rem; position: absolute; height: 5rem; width: 5rem;">
+                            <img [src]="'../../../assets/img/chofer.png'" />
+                        </ion-avatar>
+                    </div>
+                    <!-- <ion-card id="content">
+                        <ion-avatar id="profile-info">
+                            <img id="profile-image" [src]="'../../../assets/img/chofer.png'">
+                        </ion-avatar>
+                        <ion-item lines="none" style="text-align: center;">
+                            <ion-label>
+                                <h1 style="color: var(--ion-color-primary);">{{item.nombre}}</h1>
+                                <h2>{{item.puesto}}</h2>
+                                <p>{{item.sueldo | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                            </ion-label>
+                        </ion-item>
+                    </ion-card> -->
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+        <!-- <ion-card *ngFor="let item of colaboradores">
+            <ion-item>
+                <ion-avatar slot="start">
+                    <img [src]="item.url || '../../../assets/img/chofer.png'" />
+                </ion-avatar>
+                <ion-label>
+                    <h1 style="color: var(--ion-color-primary);">{{item.nombre}}</h1>
+                    <h2>{{item.puesto}}</h2>
+                    <p>{{item.sueldo | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                </ion-label>
+            </ion-item>
+        </ion-card> -->
+    </ng-container>
+    <ng-template #elseTemplate>
+
+    </ng-template>
+
+</ion-content>

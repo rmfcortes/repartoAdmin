@@ -1,0 +1,36 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-title>Ajusta la imagen</ion-title>
+        <ion-buttons slot="end">
+            <ng-container *ngIf="verPrevio; else iconTemplate">
+                <ion-button (click)="verPrevio = false">
+                    <ion-icon slot="icon-only" name="close"></ion-icon>
+                </ion-button>
+            </ng-container>
+            <ng-template #iconTemplate>
+                <ion-button [disabled]="!croppedImage" (click)="verPrevio = true">
+                    Vista previa
+                </ion-button>
+            </ng-template>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ng-container *ngIf="verPrevio; else elseTemplate">
+        <div id="contenedor">
+            <img id="foto" [src]="croppedImage" alt="">
+        </div>
+    </ng-container>
+    <ng-template #elseTemplate>
+        <image-cropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="true" [aspectRatio]="1 / 1" [resizeToWidth]="300" [resizeToHeight]="300" format="jpg" (imageCropped)="imageCropped($event)"></image-cropper>
+    </ng-template>
+
+</ion-content>
+<ion-footer>
+    <ion-toolbar>
+        <ion-button expand="block" (click)="regresar()">
+            Guardar
+        </ion-button>
+    </ion-toolbar>
+</ion-footer>

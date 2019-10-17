@@ -1,0 +1,28 @@
+#content {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+.profile {
+    margin-top: 0vh;
+    padding-top: 1.5rem;
+    background: var(--ion-color-primary);
+    --background: var(--ion-color-primary);
+    text-align: center;
+}
+
+#foto {
+    position: absolute;
+    left: 50%;
+    height: 8rem;
+    width: 8rem;
+    top: 5px;
+}
+
+.relleno {
+    width: 100vw;
+    height: 5rem;
+    margin-top: -0.5rem;
+    background: var(--ion-color-primary);
+}

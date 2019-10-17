@@ -1,0 +1,47 @@
+<ion-content>
+    <div class="profile" lines="none" *ngIf="colaborador">
+        <ion-avatar id="foto">
+            <img [src]="colaborador.url || avatar" />
+        </ion-avatar>
+        <ion-label color="light">
+            <h1 style="margin-top: 1rem;">{{colaborador.nombre}}</h1>
+        </ion-label>
+    </div>
+    <div class="relleno"></div>
+    <div class="cuadro-opciones">
+        <ion-item>
+            <ion-label>Sueldo</ion-label>
+            <ion-input color="medium" [ngModel]="colaborador.sueldo | currency:'CAD':'symbol-narrow':'1.0-0'" (ngModelChange)="sueldoChange($event)"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label>Correo</ion-label>
+            <ion-input color="medium" [(ngModel)]="colaborador.correo"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label>Contraseña</ion-label>
+            <ion-input color="medium" [(ngModel)]="colaborador.password"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label>Nacimiento</ion-label>
+            <ion-input color="medium" [(ngModel)]="colaborador.correo"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label>Puesto</ion-label>
+            <ion-input color="medium" [(ngModel)]="colaborador.puesto"></ion-input>
+        </ion-item>
+        <ion-item>
+            <ion-label>Alta</ion-label>
+            <ion-input color="medium" [(ngModel)]="colaborador.alta"></ion-input>
+        </ion-item>
+    </div>
+</ion-content>
+
+<ion-footer no-border>
+    <ion-toolbar>
+        <ion-buttons slot="end">
+            <ion-button color="primary" (click)="guardar()">
+                Guardar
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-footer>

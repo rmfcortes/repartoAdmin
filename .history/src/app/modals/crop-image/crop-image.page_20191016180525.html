@@ -1,0 +1,22 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-title>Ajusta la imagen</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ng-container *ngIf="cargando; else elseTemplate">
+        <ion-skeleton-text animated id="skeleton"></ion-skeleton-text>
+    </ng-container>
+    <ng-template #elseTemplate>
+        <image-cropper [imageChangedEvent]="imageChangedEvent" [maintainAspectRatio]="true" [aspectRatio]="1 / 1" [resizeToWidth]="300" [resizeToHeight]="300" format="jpg" (imageCropped)="imageCropped($event)" (cropperReady)="cropperReady()"></image-cropper>
+    </ng-template>
+
+</ion-content>
+<ion-footer *ngIf="!cargando">
+    <ion-toolbar>
+        <ion-button expand="block" (click)="regresar()">
+            Guardar
+        </ion-button>
+    </ion-toolbar>
+</ion-footer>

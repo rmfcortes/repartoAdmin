@@ -1,0 +1,82 @@
+import { Component, OnInit } from '@angular/core';
+import { Usuario } from 'src/app/interfaces/usuarios.interface';
+import { UsuariosService } from 'src/app/services/usuarios.service';
+import { ModalController } from '@ionic/angular';
+import { CropImagePage } from 'src/app/modals/crop-image/crop-image.page';
+
+@Component({
+  selector: 'app-usuarios',
+  templateUrl: './usuarios.page.html',
+  styleUrls: ['./usuarios.page.scss'],
+})
+export class UsuariosPage implements OnInit {
+
+  colaboradores: Usuario[] = [];
+
+  subiendoFoto = false;
+  iSel = null;
+
+  constructor(
+    private usuarioService: UsuariosService,
+    private modalController: ModalController,
+  ) { }
+
+  ngOnInit() {
+    this.getColaboradores();
+  }
+
+  async getColaboradores() {
+    this.colaboradores = await this.usuarioService.getCola();
+    console.log(this.colaboradores);
+  }
+
+  enfoca(i) {
+    this.iSel = i;
+    const input: any = document.getElementById(`foto${i}`);
+    input.click();
+  }
+
+  async cropImage(event) {
+    const modal = await this.modalController.create({
+      component: CropImagePage,
+      componentProps: {image: event}
+    });
+    return await modal.present();
+  }
+
+  onFileSelected(event) {
+    this.subiendoFoto = true;
+    const width = 300;
+    const heigth = 300;
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+      reader.onload = (evento: any) => {
+
+        const img = document.createElement('img');
+        // When the event "onload" is triggered we can resize the image.
+        img.onload = () => {
+            // We create a canvas and get its context.
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // We set the dimensions at the wanted size.
+            canvas.width = width;
+            canvas.height = heigth;
+
+            // We resize the image with the canvas method drawImage();
+            ctx.drawImage(img, 0, 0, width, heigth);
+
+            const dataURI = canvas.toDataURL();
+            const base64 = dataURI.split('data:image/png;base64,')[1];
+            this.colaboradores[this.iSel].url = dataURI;
+            // this.imagenes64 = base64;
+            this.subiendoFoto = false;
+        };
+        img.src = evento.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+}

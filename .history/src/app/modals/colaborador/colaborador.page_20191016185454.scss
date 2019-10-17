@@ -1,0 +1,23 @@
+#content {
+    height: 100%;
+    widows: 100%;
+}
+
+.foto {
+    height: 5rem;
+    width: 5rem;
+    margin: auto;
+}
+
+.profile {
+    margin-top: 0vh;
+    padding-top: 1.5rem;
+    --background: var(--ion-color-primary);
+    background: var(--ion-color-primary);
+}
+
+.relleno {
+    width: 100vw;
+    height: 5rem;
+    background: var(--ion-color-primary);
+}

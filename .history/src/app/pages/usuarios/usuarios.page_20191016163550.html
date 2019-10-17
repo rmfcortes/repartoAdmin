@@ -1,0 +1,40 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Colaboradores</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ng-container *ngIf="colaboradores.length > 0; else elseTemplate">
+        <ion-grid fixed>
+            <ion-row>
+                <ion-col size="4" *ngFor="let item of colaboradores">
+                    <ion-card>
+                        <ion-avatar style="margin-left: 50%; margin-top: -3rem">
+                            <img [src]="'../../../assets/img/chofer.png'" />
+                        </ion-avatar>
+                    </ion-card>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+        <!-- <ion-card *ngFor="let item of colaboradores">
+            <ion-item>
+                <ion-avatar slot="start">
+                    <img [src]="item.url || '../../../assets/img/chofer.png'" />
+                </ion-avatar>
+                <ion-label>
+                    <h1 style="color: var(--ion-color-primary);">{{item.nombre}}</h1>
+                    <h2>{{item.puesto}}</h2>
+                    <p>{{item.sueldo | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                </ion-label>
+            </ion-item>
+        </ion-card> -->
+    </ng-container>
+    <ng-template #elseTemplate>
+
+    </ng-template>
+
+</ion-content>

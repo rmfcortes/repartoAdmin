@@ -1,0 +1,20 @@
+.profile {
+    margin-top: 0vh;
+    padding-top: 1.5rem;
+    background: var(--ion-color-primary);
+    --background: var(--ion-color-primary);
+    text-align: center;
+}
+
+#foto {
+    margin: auto;
+    height: 7rem;
+    width: 7rem;
+}
+
+.relleno {
+    width: 100vw;
+    height: 5rem;
+    margin-top: -0.5rem;
+    background: var(--ion-color-primary);
+}

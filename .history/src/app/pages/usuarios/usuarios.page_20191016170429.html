@@ -1,0 +1,38 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Colaboradores</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ng-container *ngIf="colaboradores.length > 0; else elseTemplate">
+        <ion-grid fixed>
+            <ion-row>
+                <ion-col size="4" *ngFor="let item of colaboradores" style="padding-top: 2.5rem;">
+                    <div style="position: relative; width: 100%; height: 100%;">
+                        <ion-card id="card-user">
+                            <ion-item lines="none" style="text-align: center;">
+                                <ion-label>
+                                    <h1 style="color: var(--ion-color-primary);">{{item.nombre}}</h1>
+                                    <h2>{{item.puesto}}</h2>
+                                    <p>{{item.sueldo | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                                </ion-label>
+                            </ion-item>
+                        </ion-card>
+                        <ion-avatar id="foto">
+                            <img [src]="item.url || '../../../assets/img/chofer.png'" (click)="foto1.click()" />
+                            <input style="display: none" (change)="onFileSelected($event)" type="file" #foto1>
+                        </ion-avatar>
+                    </div>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </ng-container>
+    <ng-template #elseTemplate>
+
+    </ng-template>
+
+</ion-content>

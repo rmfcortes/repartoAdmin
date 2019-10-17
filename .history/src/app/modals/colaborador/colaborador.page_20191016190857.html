@@ -1,0 +1,24 @@
+<ion-content>
+    <div class="profile" lines="none" *ngIf="colaborador">
+        <ion-avatar id="foto">
+            <img [src]="colaborador.url || avatar" />
+        </ion-avatar>
+        <ion-label color="light">
+            <h1 style="margin-top: 1rem;">{{colaborador.nombre}}</h1>
+        </ion-label>
+    </div>
+    <div class="relleno"></div>
+    <div class="cuadro-opciones">
+        HOla
+    </div>
+</ion-content>
+
+<ion-footer no-border>
+    <ion-toolbar>
+        <ion-buttons slot="end">
+            <ion-button color="primary" (click)="guardar()">
+                Guardar
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-footer>
