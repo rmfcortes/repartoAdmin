@@ -1,0 +1,37 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-title>Reseñas</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ng-container *ngIf="rateReady; else elseTemplate">
+        <ion-grid fixed>
+            <ion-row>
+                <ion-col size="4" *ngFor="let item of rates; let i = index;" style="padding-top: 2.5rem;">
+                    <div style="position: relative; width: 100%; height: 100%;">
+                        <ion-card id="card-user">
+                            <ion-item lines="none" style="text-align: center;">
+                                <ion-label>
+                                    <h1 style="color: var(--ion-color-primary);">
+                                        {{item.nombre}}
+                                    </h1>
+                                    <app-stars [calificacion]="item.promedio"></app-stars>
+                                    <p>Promedio: {{item.promedio | number : '1.0-2'}}</p>
+                                    <p>Reseñas: {{item.calificaciones}}</p>
+                                    <a *ngIf="item.calificaciones > 0" click>ver reseñas</a>
+                                </ion-label>
+                            </ion-item>
+                        </ion-card>
+                        <ion-avatar id="foto">
+                            <img [src]="item.foto || '../../../assets/img/avatar.jpg'" />
+                        </ion-avatar>
+                    </div>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+    </ng-container>
+    <ng-template #elseTemplate>
+
+    </ng-template>
+</ion-content>

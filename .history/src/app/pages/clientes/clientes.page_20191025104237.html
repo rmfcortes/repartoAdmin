@@ -1,0 +1,137 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+            <ion-button (click)="presentActionSheet()">
+                Ordenar
+                <ion-icon slot="end" name="options"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>Clientes</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="fondo">
+    <ng-container *ngIf="clientesReady; else elseTemplate">
+        <ion-searchbar (ionChange)="busca()" [(ngModel)]="txtSearch" placeholder="Escribe el nombre o dirección de tu cliente"></ion-searchbar>
+        <ion-grid class="ion-no-padding escritorio">
+            <ion-row>
+                <ion-col size-md="4" size-lg="4" size-xl="4">
+                    <ion-card *ngFor="let cliente of clientes; let i = index" [ngClass]="{'sel': i === iSel, 'unSel': i !== iSel}" [style.display]="cliente.display">
+                        <ion-item lines="none" style="cursor: pointer" (click)="ubicarCliente(cliente, i)" style="--background: transparent">
+                            <ion-label>
+                                <h2>{{cliente.nombre}}</h2>
+                                <p class="ion-text-wrap">{{cliente.direccion.direccion}}</p>
+                                <p>Acumulado: {{cliente.acumulado | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                                <p>Última compra hace: {{cliente.dias | number : '1.0-0'}} días</p>
+                            </ion-label>
+                        </ion-item>
+                        <ion-grid *ngIf="i === iSel">
+                            <ion-row style="text-align: center">
+                                <ion-col size="8" style="border: 1px solid white; background: var(--ion-color-secondary); color: white">
+                                    Producto
+                                </ion-col>
+                                <ion-col size="4" style="border: 1px solid white; background: var(--ion-color-secondary); color: white">
+                                    Precio
+                                </ion-col>
+                            </ion-row>
+                            <ion-row style="text-align: center; background: white" *ngFor="let precio of precios; let i = index">
+                                <ion-col size="8" style="border: 1px solid var(--ion-color-secondary);">
+                                    {{precio.nombre}}
+                                </ion-col>
+                                <ion-col size="4" style="border: 1px solid var(--ion-color-secondary);">
+                                    <ion-input color="primary" [ngModel]="precio.precio | currency:'CAD':'symbol-narrow':'1.0-0'" (ngModelChange)="precioChange($event, i)" placeholder="Precio"></ion-input>
+                                </ion-col>
+                            </ion-row>
+                            <ion-row>
+                                <ion-col size="12">
+                                    <ion-button expand="block" (click)="guardaPrecio()">
+                                        Guardar precios
+                                    </ion-button>
+                                </ion-col>
+                            </ion-row>
+                        </ion-grid>
+                    </ion-card>
+                </ion-col>
+                <ion-col size-md="8" size-lg="8" size-xl="8">
+                    <div class="quieto">
+                        <agm-map style="height: 90vh;" [latitude]="ubicacion.lat" [longitude]="ubicacion.lng" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="true" [fitBounds]="true" maxZoom="17" fitBoundsPadding="bottom: 10; left: 10; right: 10; top: 10">
+                            <agm-marker *ngIf="cliente" [agmFitBounds]="true" [iconUrl]='{"url": pin || icon,"scaledSize": {"height": 80, "width": 60}}' [latitude]="cliente.direccion.lat" [longitude]="cliente.direccion.lng" [animation]="'DROP'"></agm-marker>
+                        </agm-map>
+                    </div>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+        <div [ngSwitch]="pagina" class="mobile">
+            <div *ngSwitchCase="'lista'">
+                <ion-card *ngFor="let cliente of clientes; let i = index">
+                    <ion-item lines="none" style="cursor: pointer" (click)="ubicarCliente(cliente, i)" detail>
+                        <ion-label>
+                            <h2 style="color: var(--ion-color-primary);">{{cliente.nombre}}</h2>
+                            <h4 class="ion-text-wrap">{{cliente.direccion.direccion}}</h4>
+                            <h4>Acumulado: {{cliente.acumulado | currency:'CAD':'symbol-narrow':'1.0-0'}}</h4>
+                            <h4>Última compra hace: {{cliente.dias | number : '1.0-0'}} días</h4>
+                        </ion-label>
+                    </ion-item>
+                </ion-card>
+            </div>
+            <div *ngSwitchCase="'mapa'">
+                <agm-map style="height: 90vh;" [latitude]="ubicacion.lat" [longitude]="ubicacion.lng" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="true" [fitBounds]="true" maxZoom="17" fitBoundsPadding="bottom: 10; left: 10; right: 10; top: 10">
+                    <agm-marker [agmFitBounds]="true" [iconUrl]='{"url": pin || icon,"scaledSize": {"height": 80, "width": 60}}' [latitude]="cliente.direccion.lat" [longitude]="cliente.direccion.lng" [animation]="'DROP'"></agm-marker>
+                </agm-map>
+                <!-- <div class="cuadro" *ngIf="verChofer">
+                    <app-cuadro-mapa [persona]="repartidor" (cierra)="deSelect()" (clientes)="verVentas()" (ruta)="verRuta()"></app-cuadro-mapa>
+                </div> -->
+            </div>
+        </div>
+        <ion-infinite-scroll threshold="100px" (ionInfinite)="loadClientes($event)" *ngIf="pagina === 'lista'">
+            <ion-infinite-scroll-content loadingSpinner="bubbles">
+            </ion-infinite-scroll-content>
+        </ion-infinite-scroll>
+    </ng-container>
+    <ng-template #elseTemplate>
+        <ion-item class="escritorio">
+            <ion-grid fixed>
+                <ion-row>
+                    <ion-col size="4">
+                        <ion-card *ngFor="let item of [1,2,3,4,5,6,7,8,9,10]">
+                            <ion-label>
+                                <h3>
+                                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                                </h3>
+                                <p>
+                                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                                </p>
+                                <p>
+                                    <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                                </p>
+                            </ion-label>
+                        </ion-card>
+                    </ion-col>
+                    <ion-col size="8">
+                        <ion-skeleton-text animated style="width: 100%; height: 90vh"></ion-skeleton-text>
+                    </ion-col>
+                </ion-row>
+            </ion-grid>
+        </ion-item>
+        <ion-item *ngFor="let item of [1,2,3,4,5,6,7,8,9,10]" class="mobile">
+            <ion-thumbnail slot="start">
+                <ion-skeleton-text></ion-skeleton-text>
+            </ion-thumbnail>
+            <ion-label>
+                <h3>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </h3>
+                <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                </p>
+                <p>
+                    <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                </p>
+            </ion-label>
+        </ion-item>
+    </ng-template>
+
+</ion-content>

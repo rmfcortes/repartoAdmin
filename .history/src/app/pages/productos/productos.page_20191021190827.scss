@@ -1,0 +1,31 @@
+#card-user {
+    box-shadow: 0px -1px 10px #00000066;
+    height: 300px;
+    padding-top: 2rem;
+}
+
+#foto {
+    margin: auto;
+    width: 65%;
+    cursor: pointer;
+}
+
+#editar-icon {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    font-size: 20pt;
+}
+
+#borrar-icon {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    font-size: 20pt;
+}
+
+#skel {
+    width: 80%;
+    height: 80%;
+    margin: auto;
+}

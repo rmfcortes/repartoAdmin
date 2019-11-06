@@ -1,0 +1,26 @@
+<ion-header no-border>
+    <ion-toolbar>
+        <ion-title color="primary">Buscar</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="cerrar()">
+                <ion-icon color="primary" slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-item style="width: 80%; margin-left: 10%">
+        <ion-label color="primary" position="stacked">Ingresa el nombre
+            <ion-text color="danger">*</ion-text>
+        </ion-label>
+        <ion-input id="txtHome" type="text" debounce='850' (ionChange)="busca()" [(ngModel)]="txtSearch" name="direccion"></ion-input>
+
+        <ion-list>
+            <ion-item lines="full" *ngFor="let item of resultados" detail style="cursor: pointer;">
+                <ion-label>{{item.nombre}}</ion-label>
+            </ion-item>
+        </ion-list>
+    </ion-item>
+
+</ion-content>

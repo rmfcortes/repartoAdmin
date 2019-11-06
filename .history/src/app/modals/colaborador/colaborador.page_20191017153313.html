@@ -1,0 +1,65 @@
+<ion-content>
+    <div class="profile" lines="none" *ngIf="colaborador">
+        <ion-avatar id="foto" style="cursor: pointer">
+            <img [src]="colaborador.url || avatar" (click)="foto.click()" />
+            <input style="display: none" (change)="cropImage($event)" type="file" #foto>
+        </ion-avatar>
+        <ion-label color="light">
+            <h1 style="margin-top: 1rem;">{{colaborador.nombre || 'Nuevo colaborador'}}</h1>
+        </ion-label>
+    </div>
+    <div class="relleno"></div>
+    <div class="cuadro-opciones">
+        <form #forma="ngForm" (submit)="guardar()">
+            <ion-item>
+                <ion-label>Nombre</ion-label>
+                <ion-input color="medium" [(ngModel)]="colaborador.nombre" required name="nombre"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label>Sueldo</ion-label>
+                <ion-input required color="medium" [ngModel]="colaborador.sueldo | currency:'CAD':'symbol-narrow':'1.0-0'" name="sueldo" (ngModelChange)="sueldoChange($event)"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label>Correo</ion-label>
+                <ion-input required type="email" color="medium" [(ngModel)]="colaborador.correo" name="correo"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label>Contraseña</ion-label>
+                <ion-input required type="text" color="medium" [(ngModel)]="colaborador.password" name="pass"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label>Cumpleaños</ion-label>
+                <ion-datetime color="medium" [(ngModel)]="colaborador.nacimiento" cancelText="Cancelar" doneText="Aceptar" [monthShortNames]="meses" placeholder="Selecciona una fecha" name="cumple"></ion-datetime>
+            </ion-item>
+            <ion-item>
+                <ion-icon style="cursor: pointer;" slot="end" name="add" color="primary" (click)="addPuesto()"></ion-icon>
+                <ion-label>Puesto
+                </ion-label>
+                <ion-select color="medium" interface="popover" [(ngModel)]="colaborador.puesto" name="puesto">
+                    <ion-select-option (ionChange)="puestoChange(item)" [value]="item" *ngFor="let item of puestos">{{item}}</ion-select-option>
+                </ion-select>
+            </ion-item>
+            <ion-item>
+                <ion-label>Alta</ion-label>
+                <ion-datetime color="medium" [(ngModel)]="colaborador.alta" cancelText="Cancelar" doneText="Aceptar" [monthShortNames]="meses" placeholder="Selecciona una fecha" name="alta"></ion-datetime>
+            </ion-item>
+        </form>
+    </div>
+</ion-content>
+
+<ion-footer no-border>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button color="primary" (click)="salir()">
+                Cancelar
+            </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+            <!-- [disabled]="!forma.valid || guardando" -->
+            <ion-button color="primary" (click)="guardar()">
+                Guardar
+                <ion-spinner *ngIf="guardando" name="dots"></ion-spinner>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-footer>

@@ -1,0 +1,399 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Repartidores</ion-title>
+    </ion-toolbar>
+    <ion-toolbar color="primary" class="mobile">
+        <ion-segment [disabled]="!repaReady">
+            <ion-segment-button value="lista" [checked]="pagina === 'lista'">
+                <ion-label>Lista</ion-label>
+            </ion-segment-button>
+            <ion-segment-button [disabled]="repartidores && repartidores.length === 0" value="mapa" [checked]="pagina === 'mapa'">
+                <ion-label>Mapa</ion-label>
+            </ion-segment-button>
+        </ion-segment>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content class="fondo">
+    <ng-container *ngIf="repaReady; else elseTemplate">
+        <ion-searchbar (ionChange)="busca()" [(ngModel)]="txtSearch" placeholder="Escribe el nombre del vendedor"></ion-searchbar>
+        <ion-button fill="outline" color="primary" style="background: white; overflow: hidden;" (click)="openCalendar()">
+            {{fecha | date: 'fullDate' | titlecase}}
+            <ion-icon slot="end" name="calendar"></ion-icon>
+        </ion-button>
+        <ion-grid class="ion-no-padding escritorio">
+            <ion-row>
+                <ion-col size-md="4" size-lg="4" size-xl="3">
+                    <ng-container *ngIf="cargandoRepas; else repasTemplate">
+                        <ion-progress-bar type="indeterminate"></ion-progress-bar>
+                    </ng-container>
+                    <ng-template #repasTemplate>
+                        <ion-card style="background: white;" *ngIf="pedidos.asignados > 0 ||  pedidos.pendientes > 0">
+                            <ion-item lines="none">
+                                <ion-label>
+                                    <h2>Pedidos</h2>
+                                    <p>Asignados: {{pedidos.asignados}}</p>
+                                    <p>Pendientes: {{pedidos.pendientes}}</p>
+                                </ion-label>
+                            </ion-item>
+                            <ng-container *ngIf="detallesPedidos.length > 0; else pedidosTemplate">
+                                <ion-button expand="block" fill="clear" (click)="limpiaPedidos()" color="danger">
+                                    Cancelar
+                                </ion-button>
+                            </ng-container>
+                            <ng-template #pedidosTemplate>
+                                <ion-button expand="block" fill="clear" (click)="verPedidos()" [disabled]="loadPedidos">
+                                    Ver detalles
+                                    <ion-spinner style="margin-left: 0.75rem" name="dots" *ngIf="loadPedidos"></ion-spinner>
+                                </ion-button>
+                            </ng-template>
+                        </ion-card>
+                        <ion-card *ngFor="let item of repartidores; let i = index" [ngStyle]="{'border': i === iSel ? 'solid var(--ion-color-primary) 5px' : null}" [style.display]="item.display" style="background: white;">
+                            <ion-item lines="none" [style.cursor]="i === iSel? null :'pointer'" (click)="ubicarRepartidor(item, i)">
+                                <ion-avatar slot="start">
+                                    <img [src]="item.datos.foto || '../../../assets/img/chofer.png'" />
+                                </ion-avatar>
+                                <ion-label>
+                                    <h2>{{item.datos.nombre}}</h2>
+                                    <p>Venta: {{item.sumario.venta | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                                    <p>Gasto: {{item.sumario.gasto | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                                    <p>Viajes: {{item.sumario.viajes}}</p>
+                                    <p *ngIf="item.sumario.balance">Balance: {{item.sumario.balance | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                                    <p *ngIf="item.sumario.entrega">Entrega: {{item.sumario.entrega | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                                    <p *ngIf="item.sumario.diferencia">Diferencia: {{item.sumario.diferencia | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                                    <p *ngIf="item.sumario.valida">Valida entrega: {{item.sumario.valida}}</p>
+                                </ion-label>
+                            </ion-item>
+                            <div *ngIf="iSel === i">
+                                <div *ngIf="item.sumario.venta">
+                                    <ng-container *ngIf="ventas.length > 0; else ventasTemplate">
+                                        <ion-button expand="block" fill="clear" (click)="limpiaVentas()" color="danger">
+                                            Cancelar
+                                        </ion-button>
+                                    </ng-container>
+                                    <ng-template #ventasTemplate>
+                                        <ion-button expand="block" fill="clear" (click)="verVentas()" [disabled]="cargando && getBtn === 'ventas'">
+                                            <ion-icon style="margin-right: 0.75rem" name="trending-up"></ion-icon> Ver ventas
+                                            <ion-spinner style="margin-left: 0.75rem" name="dots" *ngIf="cargando && getBtn === 'ventas'"></ion-spinner>
+                                        </ion-button>
+                                    </ng-template>
+                                </div>
+                                <ng-container *ngIf="latlng.length > 0; else rutasTemplate">
+                                    <ion-button expand="block" fill="clear" (click)="limpiaRuta()" color="danger">
+                                        Cancelar
+                                    </ion-button>
+                                </ng-container>
+                                <ng-template #rutasTemplate>
+                                    <ion-button expand="block" fill="clear" (click)="verRuta()" [disabled]="cargando && getBtn === 'ruta'">
+                                        <ion-icon style="margin-right: 0.75rem" name="car"></ion-icon> Ver ruta
+                                        <ion-spinner style="margin-left: 0.75rem" name="dots" *ngIf="cargando && getBtn === 'ruta'"></ion-spinner>
+                                    </ion-button>
+                                </ng-template>
+                                <div *ngIf="item.sumario.gasto">
+                                    <ng-container *ngIf="compras.length > 0; else comprasTemplate">
+                                        <ion-button fill="clear" expand="block" (click)="limpiaCompras()" color="danger">
+                                            Cancelar
+                                        </ion-button>
+                                    </ng-container>
+                                    <ng-template #comprasTemplate>
+                                        <ion-button expand="block" fill="clear" (click)="verGastos()" [disabled]="cargando && getBtn === 'compras'">
+                                            <ion-icon style="margin-right: 0.75rem" name="trending-down"></ion-icon> Ver Compras
+                                            <ion-spinner style="margin-left: 0.75rem" name="dots" *ngIf="cargando && getBtn === 'compras'"></ion-spinner>
+                                        </ion-button>
+                                    </ng-template>
+                                </div>
+                            </div>
+                        </ion-card>
+                    </ng-template>
+
+                </ion-col>
+                <ion-col size-md="8" size-lg="8" size-xl="9">
+                    <div class="quieto">
+                        <div class="cuadro-detalles" style="color: #413f3f">
+                            <ion-grid class="ion-no-padding" style="margin-bottom: 0.75rem;" *ngIf="detallesPedidos.length > 0">
+                                <ion-row style="text-align: center">
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Creado
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Cliente
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Productos
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Vendedor
+                                    </ion-col>
+                                    <ion-col size="1" class="ion-no-padding" style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        <ng-container *ngIf="verDetPed; else venTemplate">
+                                            <ion-icon (click)="verDetPed = false" color="light" style="font-size: 18pt;" name="arrow-dropup-circle"></ion-icon>
+                                        </ng-container>
+                                        <ng-template #venTemplate>
+                                            <ion-icon (click)="verDetPed = true" color="light" style="font-size: 18pt;" name="arrow-dropdown-circle"></ion-icon>
+                                        </ng-template>
+                                    </ion-col>
+                                </ion-row>
+                                <div *ngIf="verDetPed && !loadPedidos">
+                                    <ion-row style="text-align: center" *ngFor="let pedido of detallesPedidos">
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{pedido.pedido.createdAt | date:'h:mm a'}}
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{pedido.pedido.usuario}}
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            <ion-text *ngFor="let prod of pedido.pedido.productos">{{prod.nombre}}: {{prod.cantidad}}</ion-text>
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{pedido.chofer || 'Pendiente de vendedor'}}
+                                        </ion-col>
+                                        <ion-col size="1">
+
+                                        </ion-col>
+                                    </ion-row>
+                                </div>
+                            </ion-grid>
+                            <ion-grid class="ion-no-padding" style="margin-bottom: 0.75rem;" *ngIf="detallesViajes.length > 0">
+                                <ion-row style="text-align: center">
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Viaje
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Venta
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Inicio
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Valida
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Fin
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Valida
+                                    </ion-col>
+                                    <ion-col size="1" class="ion-no-padding" style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        <ng-container *ngIf="verDetVen; else venTemplate">
+                                            <ion-icon (click)="verDetVen = false" color="light" style="font-size: 18pt;" name="arrow-dropup-circle"></ion-icon>
+                                        </ng-container>
+                                        <ng-template #venTemplate>
+                                            <ion-icon (click)="verDetVen = true" color="light" style="font-size: 18pt;" name="arrow-dropdown-circle"></ion-icon>
+                                        </ng-template>
+                                    </ion-col>
+                                </ion-row>
+                                <div *ngIf="verDetVen">
+                                    <ion-row style="text-align: center" *ngFor="let viaje of detallesViajes">
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{viaje.viaje}}
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{viaje.venta | currency:'CAD':'symbol-narrow':'1.0-0'}}
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{viaje.inicio}}
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{viaje.validaInicio}}
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{viaje.fin}}
+                                        </ion-col>
+                                        <ion-col>
+                                            {{viaje.validaFin}}
+                                        </ion-col>
+                                        <ion-col size="1">
+
+                                        </ion-col>
+                                    </ion-row>
+                                </div>
+                            </ion-grid>
+                            <ion-grid class="ion-no-padding" style="margin-bottom: 0.75rem;" *ngIf="latlng.length > 0">
+                                <ion-row style="text-align: center">
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Recorrido
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Duración
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Inicio
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Fin
+                                    </ion-col>
+                                    <ion-col size="1" class="ion-no-padding" style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        <ng-container *ngIf="verDetRut; else rutTemplate">
+                                            <ion-icon (click)="verDetRut = false" color="light" style="font-size: 18pt;" name="arrow-dropup-circle"></ion-icon>
+                                        </ng-container>
+                                        <ng-template #rutTemplate>
+                                            <ion-icon (click)="verDetRut = true" color="light" style="font-size: 18pt;" name="arrow-dropdown-circle"></ion-icon>
+                                        </ng-template>
+                                    </ion-col>
+                                </ion-row>
+                                <div *ngIf="verDetRut">
+                                    <ion-row style="text-align: center">
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{recorrido | number : '1.0-2'}}kms
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{horas}}:{{minutos}}hrs
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{latlng[0].stamp | date: 'h:mm a'}}
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{latlng[latlng.length - 1].stamp | date: 'h:mm a'}}
+                                        </ion-col>
+                                        <ion-col size="1">
+
+                                        </ion-col>
+                                    </ion-row>
+                                </div>
+                            </ion-grid>
+                            <ion-grid class="ion-no-padding" *ngIf="compras.length > 0">
+                                <ion-row style="text-align: center">
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Viaje
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Nombre
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Cantidad
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Costo
+                                    </ion-col>
+                                    <ion-col style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        Total
+                                    </ion-col>
+                                    <ion-col size="1" class="ion-no-padding" style="border: 1px solid white; background: var(--ion-color-primary); color: white">
+                                        <ng-container *ngIf="verDetCom; else comTemplate">
+                                            <ion-icon (click)="verDetCom = false" color="light" style="font-size: 18pt;" name="arrow-dropup-circle"></ion-icon>
+                                        </ng-container>
+                                        <ng-template #comTemplate>
+                                            <ion-icon (click)="verDetCom = true" color="light" style="font-size: 18pt;" name="arrow-dropdown-circle"></ion-icon>
+                                        </ng-template>
+                                    </ion-col>
+                                </ion-row>
+                                <div *ngIf="verDetCom">
+                                    <ion-row style="text-align: center" *ngFor="let viaje of compras">
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{viaje.viaje}}
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{viaje.nombre}}
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{viaje.cantidad}}
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{viaje.costo | currency:'CAD':'symbol-narrow':'1.0-0'}}
+                                        </ion-col>
+                                        <ion-col style="border-right: 1px solid var(--ion-color-primary);">
+                                            {{viaje.total | currency:'CAD':'symbol-narrow':'1.0-0'}}
+                                        </ion-col>
+                                        <ion-col size="1">
+
+                                        </ion-col>
+                                    </ion-row>
+                                </div>
+                            </ion-grid>
+                        </div>
+                        <agm-map style="height: 90vh;" [latitude]="ubicacion.lat" [longitude]="ubicacion.lng" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true" maxZoom="17" fitBoundsPadding="bottom: 10; left: 10; right: 10; top: 10">
+                            <agm-marker *ngFor="let item of repartidores; let i = index" [agmFitBounds]="true" (markerClick)="verRepartidor(item, i)" [iconUrl]='{"url": item.icon || icon,"scaledSize": {"height": 80, "width": 60}}' [latitude]="item.ubicacion.lat" [longitude]="item.ubicacion.lng"
+                                [animation]="'DROP'"></agm-marker>
+                            <agm-marker *ngFor="let item of ventas; let i = index" [agmFitBounds]="true" (markerClick)="verInfoCliente(item, i)" [latitude]="item.Datos.lat" [longitude]="item.Datos.lng" [animation]="'DROP'" label="{{i + 1}}">
+                                <agm-info-window [disableAutoPan]="true" [isOpen]="isInfoWindowOpen(i)">
+                                    <strong>Cliente: {{item.Datos.cliente? item.Datos.cliente : 'No registrado'}} </strong><br> Hora: {{item.Datos.hora | date: 'shortTime'}} <br> Total: {{item.Datos.total | currency:'CAD':'symbol-narrow':'1.0-0'}}
+                                </agm-info-window>
+                            </agm-marker>
+                            <agm-polyline *ngFor="let point of latlng; let i = index;" [strokeColor]="point.speed < 14 ? '#2196f3': 'red'">
+                                <agm-polyline-point [agmFitBounds]="true" [latitude]="point.lat" [longitude]="point.lng">
+                                </agm-polyline-point>
+                                <ng-container *ngIf="latlng[i+1]">
+                                    <agm-polyline-point [latitude]="latlng[i+1].lat" [longitude]="latlng[i+1].lng">
+                                    </agm-polyline-point>
+                                </ng-container>
+                            </agm-polyline>
+                        </agm-map>
+                    </div>
+                </ion-col>
+            </ion-row>
+        </ion-grid>
+        <div [ngSwitch]="pagina" class="mobile">
+            <div *ngSwitchCase="'lista'">
+                <ion-card *ngFor="let item of repartidores; let i = index">
+                    <ion-item lines="none" (click)="ubicarRepartidor(item, i)" detail>
+                        <ion-avatar slot="start">
+                            <img [src]="item.datos.foto || '../../../assets/img/chofer.png'" />
+                        </ion-avatar>
+                        <ion-label>
+                            <h2>{{item.datos.nombre}}</h2>
+                            <p>Venta: {{item.sumario.venta | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                            <p>Gasto: {{item.sumario.gasto | currency:'CAD':'symbol-narrow':'1.0-0'}}</p>
+                            <p>Viajes: {{item.sumario.viajes}}</p>
+                        </ion-label>
+                    </ion-item>
+                </ion-card>
+            </div>
+            <div *ngSwitchCase="'mapa'">
+                <agm-map style="height: 100vh;" [latitude]="ubicacion.lat" [longitude]="ubicacion.lng" [disableDefaultUI]="true" [streetViewControl]="false" [zoomControl]="false" [fitBounds]="true" maxZoom="17" fitBoundsPadding="bottom: 10; left: 10; right: 10; top: 10">
+                    <agm-marker *ngFor="let item of repartidores; let i = index" [agmFitBounds]="true" (markerClick)="verRepartidor(item, i)" [iconUrl]='{"url": item.icon || icon,"scaledSize": {"height": 80, "width": 60}}' [latitude]="item.ubicacion.lat" [longitude]="item.ubicacion.lng"
+                        [animation]="'DROP'"></agm-marker>
+                </agm-map>
+                <div class="cuadro" *ngIf="verChofer">
+                    <app-cuadro-mapa [persona]="repartidor" (cierra)="deSelect()" (clientes)="verVentas()" (ruta)="verRuta()"></app-cuadro-mapa>
+                </div>
+            </div>
+        </div>
+
+    </ng-container>
+    <ng-template #elseTemplate>
+        <ion-item class="escritorio">
+            <ion-grid fixed>
+                <ion-row>
+                    <ion-col size="4">
+                        <ion-card *ngFor="let item of [1,2,3,4,5,6,7,8,9,10]">
+                            <ion-label>
+                                <h3>
+                                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                                </h3>
+                                <p>
+                                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                                </p>
+                                <p>
+                                    <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                                </p>
+                            </ion-label>
+                        </ion-card>
+                    </ion-col>
+                    <ion-col size="8">
+                        <ion-skeleton-text animated style="width: 100%; height: 90vh"></ion-skeleton-text>
+                    </ion-col>
+                </ion-row>
+            </ion-grid>
+        </ion-item>
+        <ion-item *ngFor="let item of [1,2,3,4,5,6,7,8,9,10]" class="mobile">
+            <ion-thumbnail slot="start">
+                <ion-skeleton-text></ion-skeleton-text>
+            </ion-thumbnail>
+            <ion-label>
+                <h3>
+                    <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+                </h3>
+                <p>
+                    <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+                </p>
+                <p>
+                    <ion-skeleton-text animated style="width: 30%"></ion-skeleton-text>
+                </p>
+            </ion-label>
+        </ion-item>
+    </ng-template>
+
+</ion-content>

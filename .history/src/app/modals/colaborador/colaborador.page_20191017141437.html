@@ -1,0 +1,64 @@
+<ion-content>
+    <div class="profile" lines="none" *ngIf="colaborador">
+        <ion-avatar id="foto" style="cursor: pointer">
+            <img [src]="colaborador.url || avatar" (click)="foto.click()" />
+            <input style="display: none" (change)="cropImage($event)" type="file" #foto>
+        </ion-avatar>
+        <ion-label color="light">
+            <h1 style="margin-top: 1rem;">{{colaborador.nombre || 'Nuevo colaborador'}}</h1>
+        </ion-label>
+    </div>
+    <div class="relleno"></div>
+    <div class="cuadro-opciones">
+        <form #forma="ngForm" (submit)="guardar()">
+            <ion-item>
+                <ion-label>Nombre</ion-label>
+                <ion-input color="medium" [(ngModel)]="colaborador.nombre" required name="nombre"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label>Sueldo</ion-label>
+                <ion-input required color="medium" [ngModel]="colaborador.sueldo | currency:'CAD':'symbol-narrow':'1.0-0'" name="sueldo" (ngModelChange)="sueldoChange($event)"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label>Correo</ion-label>
+                <ion-input required type="email" color="medium" [(ngModel)]="colaborador.correo" name="correo"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label>Contraseña</ion-label>
+                <ion-input required type="text" color="medium" [(ngModel)]="colaborador.password" name="pass"></ion-input>
+            </ion-item>
+            <ion-item>
+                <ion-label>Cumpleaños
+                </ion-label>
+                <ion-input color="medium" type="text" readonly [(ngModel)]="colaborador.nacimiento" name="cumple"></ion-input>
+                <ion-icon color="primary" (click)="openCalendar()" slot="end" name="calendar" style="cursor: pointer;"></ion-icon>
+            </ion-item>
+            <ion-item>
+                <ion-label>Puesto</ion-label>
+                <ion-select interface="popover">
+                    <ion-select-option (ionChange)="puestoChange(item)" [value]="item" *ngFor="let item of puestos">{{item}}</ion-select-option>
+                </ion-select>
+            </ion-item>
+            <ion-item>
+                <ion-label>Alta</ion-label>
+                <ion-input required color="medium" type="text" readonly [(ngModel)]="colaborador.alta" name="alta"></ion-input>
+            </ion-item>
+        </form>
+    </div>
+</ion-content>
+
+<ion-footer no-border>
+    <ion-toolbar>
+        <ion-buttons slot="start">
+            <ion-button color="primary" (click)="guardar()">
+                Cancelar
+            </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+            <ion-button color="primary" [disabled]="!forma.valid || guardando" type="submit">
+                Guardar
+                <ion-spinner *ngIf="guardando" name="dots"></ion-spinner>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-footer>

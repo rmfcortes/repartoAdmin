@@ -1,0 +1,21 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-title>{{colaborador.nombre}}</ion-title>
+        <ion-buttons slot="end">
+            <ion-button (click)="salir()">
+                <ion-icon slot="icon-only" name="close"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-list>
+        <ion-item *ngFor="let item of comentarios">
+            <ion-label>
+                <h2>{{item.calificacion.comentarios}}</h2>
+                <p>{{item.fecha | date:'medium'}}</p>
+            </ion-label>
+        </ion-item>
+    </ion-list>
+</ion-content>
