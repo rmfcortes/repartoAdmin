@@ -30,7 +30,7 @@
     "core-js": "^2.5.4",
     "firebase": "^7.0.0",
     "ion2-calendar": "^3.0.0-rc.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "ngx-image-cropper": "^2.0.2",
     "rxjs": "~6.5.1",
     "tslib": "^1.9.0",
